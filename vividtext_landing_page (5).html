@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VividText - Dyslexia-Friendly Reading & Writing App for Students</title>
+  
+  <!-- Open Graph Metadata for Social Sharing -->
+  <meta property="og:title" content="VividText - Dyslexia-Friendly Essay Editor">
+  <meta property="og:description" content="Write essays that sound as smart as you are, ditch grammar penalties, and finish drafts fast.">
+  <meta property="og:type" content="website">
+
+  <!-- Modern Typography (Plus Jakarta Sans & Lexend for Dyslexic Legibility) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* CSS RESET & DESIGN TOKENS */
+    :root {
+      --bg-color: #fffdf9;          /* Warm off-white background reducing glare */
+      --card-bg: #ffffff;          /* Clean white card backgrounds */
+      --text-main: #333333;        /* Dark Charcoal primary text */
+      --text-muted: #666666;       /* Muted gray subtext */
+      --primary: #FFDAB9;         /* Peach Puff primary brand accent */
+      --primary-dark: #333333;    /* Dark Charcoal for high contrast elements */
+      --primary-hover: #f7cd9d;   /* Rich peach hover state */
+      --accent-soft: #fff4e8;
+      --border-color: #eae7e1;
+      --border-hover: #ffd0a1;
+      --success-green: #15803d;
+      --shadow-sm: 0 2px 8px rgba(51, 51, 51, 0.04);
+      --shadow-md: 0 8px 24px rgba(51, 51, 51, 0.06);
+      --shadow-lg: 0 16px 40px rgba(51, 51, 51, 0.08);
+      --radius-lg: 20px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --font-stack: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Accessibility Theme Mode for Dyslexic Readers */
+    body.accessible-font {
+      --font-stack: 'Lexend', system-ui, sans-serif;
+      letter-spacing: 0.03em;
+      line-height: 1.8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-stack);
+      line-height: 1.65;
+      font-size: 1.125rem;
+      letter-spacing: 0.005em;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    section {
+      padding: 5rem 0;
+      position: relative;
+    }
+
+    h1, h2, h3 {
+      color: var(--text-main);
+      line-height: 1.25;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+    }
+
+    strong {
+      color: var(--text-main);
+    }
+
+    /* BUTTONS & CONTROLS */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary);
+      color: var(--primary-dark);
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 0.85rem 1.75rem;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 2px solid var(--primary-dark);
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(51, 51, 51, 0.08);
+    }
+
+    .btn:hover, .btn:focus {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(51, 51, 51, 0.12);
+      outline: none;
+    }
+
+    .btn-large {
+      padding: 1rem 2.25rem;
+      font-size: 1.15rem;
+      border-radius: var(--radius-md);
+    }
+
+    /* HEADER */
+    header {
+      padding: 1.25rem 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    header .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header .logo {
+      font-size: 1.6rem;
+      color: var(--text-main);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    header .logo-badge {
+      width: 12px;
+      height: 12px;
+      background-color: var(--primary);
+      border: 2px solid var(--primary-dark);
+      border-radius: 50%;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: color 0.15s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-main);
+    }
+
+    /* HERO SECTION */
+    .hero {
+      padding-top: 4rem;
+      padding-bottom: 5rem;
+      background: linear-gradient(180deg, rgba(255,218,185,0.18) 0%, rgba(255,253,249,0) 100%);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3.5rem;
+      align-items: center;
+    }
+
+    .hero-content-left {
+      text-align: left;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--primary);
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      margin-bottom: 1.5rem;
+      border: 1.5px solid var(--text-main);
+    }
+
+    .hero h1 {
+      font-size: 2.75rem;
+      line-height: 1.2;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-sub {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 1.75rem;
+      line-height: 1.6;
+    }
+
+    .reader-toggle-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background-color: #ffffff;
+      border: 1.5px solid var(--border-color);
+      padding: 0.4rem 0.8rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .reader-toggle-bar input {
+      cursor: pointer;
+    }
+
+    /* REALISTIC SAAS EDITOR MOCKUP SHOWING REAL WORK */
+    .hero-mockup-wrapper {
+      position: relative;
+    }
+
+    .app-mockup {
+      background: #ffffff;
+      border: 2px solid var(--primary-dark);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .mockup-topbar {
+      background: var(--text-main);
+      color: #ffffff;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .mockup-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mockup-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .md-1 { background-color: #ff5f56; }
+    .md-2 { background-color: #ffbd2e; }
+    .md-3 { background-color: #27c93f; }
+
+    .mockup-title-bar {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+      background: rgba(255, 255, 255, 0.1);
+      padding: 0.2rem 0.75rem;
+      border-radius: 4px;
+    }
+
+    .mockup-workspace {
+      display: flex;
+      min-height: 330px;
+    }
+
+    .mockup-sidebar {
+      width: 32%;
+      background-color: #f7f6f3;
+      border-right: 1px solid var(--border-color);
+      padding: 1rem;
+    }
+
+    .mockup-sidebar-item {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .mockup-sidebar-item.active {
+      background-color: var(--primary);
+      color: var(--text-main);
+      border: 1px solid var(--primary-dark);
+    }
+
+    .mockup-main {
+      width: 68%;
+      padding: 1.25rem;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Score transformation badge */
+    .score-transformation {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--accent-soft);
+      border: 1px solid var(--primary);
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.8rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .score-badge {
+      background-color: #10b981;
+      color: #ffffff;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .mockup-editor-text {
+      font-size: 0.9rem;
+      line-height: 1.6;
+      color: var(--text-main);
+    }
+
+    .mockup-strikethrough {
+      text-decoration: line-through;
+      color: #ef4444;
+      background-color: #fee2e2;
+      padding: 0 0.2rem;
+    }
+
+    .mockup-correction {
+      background-color: #d1fae5;
+      color: #065f46;
+      font-weight: bold;
+      padding: 0 0.2rem;
+      border-radius: 3px;
+    }
+
+    .progress-bar-container {
+      margin-top: 1rem;
+      background-color: #f1f5f9;
+      border-radius: 50px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      width: 82%;
+      height: 100%;
+      background-color: var(--primary-dark);
+    }
+
+    /* TRUST BAR */
+    .trust-bar {
+      text-align: center;
+      padding: 1.25rem 0;
+      background-color: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    /* SECTION 2: THE PROBLEM */
+    .problem-section {
+      background-color: #ffffff;
+    }
+
+    .quote-card {
+      background-color: var(--bg-color);
+      border: 2px solid var(--primary-dark);
+      border-left: 8px solid var(--primary-dark);
+      padding: 2.5rem;
+      border-radius: var(--radius-lg);
+      margin-bottom: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .quote-text {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-main);
+      font-style: italic;
+      line-height: 1.4;
+    }
+
+    .cost-box {
+      font-size: 1.15rem;
+      background-color: var(--accent-soft);
+      border: 2px solid var(--primary-dark);
+      color: var(--text-main);
+      padding: 1.75rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* SECTION: WHO IT'S FOR */
+    .audience-section {
+      background-color: var(--bg-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .audience-card {
+      background: var(--card-bg);
+      border: 2px solid var(--border-color);
+      padding: 1.5rem;
+      border-radius: var(--radius-md);
+      text-align: center;
+    }
+
+    .audience-card h3 {
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+    }
+
+    /* SECTION: WHY VIVIDTEXT COMPARISON TABLE */
+    .comparison-section {
+      background-color: #ffffff;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .comparison-table-wrapper {
+      overflow-x: auto;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      margin-top: 2rem;
+    }
+
+    .comparison-table th, .comparison-table td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .comparison-table th {
+      background-color: #fcfbf7;
+      font-weight: 800;
+    }
+
+    .comparison-table th.highlight-col, .comparison-table td.highlight-col {
+      background-color: var(--accent-soft);
+      border-left: 2px solid var(--primary-dark);
+      border-right: 2px solid var(--primary-dark);
+    }
+
+    /* SECTION 3: STEPS & PRICING */
+    .section-title {
+      font-size: 2.25rem;
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 1.75rem;
+      margin-bottom: 5rem;
+    }
+
+    .step-card {
+      background-color: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 2rem 1.5rem;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.25s ease;
+    }
+
+    .step-card:hover {
+      border-color: var(--primary-dark);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      background-color: var(--primary-dark);
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 1.1rem;
+      border-radius: 50%;
+    }
+
+    .step-icon {
+      font-size: 1.5rem;
+    }
+
+    .step-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Pricing Table Redesign */
+    .pricing-card {
+      background-color: var(--card-bg);
+      border: 3px solid var(--primary-dark);
+      border-radius: var(--radius-lg);
+      padding: 3rem 2.5rem;
+      max-width: 620px;
+      margin: 0 auto;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--primary);
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.4rem 1.2rem;
+      border-radius: 50px;
+      border: 2px solid var(--primary-dark);
+    }
+
+    .price-tag {
+      font-size: 4rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1;
+      margin: 1.25rem 0 0.25rem 0;
+    }
+
+    .price-period {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+
+    .features-list {
+      text-align: left;
+      list-style: none;
+      margin: 2rem 0;
+    }
+
+    .features-list li {
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      font-size: 1.05rem;
+    }
+
+    .features-list li:last-child {
+      border-bottom: none;
+    }
+
+    .check-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background-color: var(--primary);
+      color: var(--primary-dark);
+      border-radius: 50%;
+      font-weight: 900;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .guarantee-box {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background-color: var(--primary);
+      border-radius: var(--radius-md);
+      border: 2px solid var(--primary-dark);
+      text-align: left;
+    }
+
+    .guarantee-box strong {
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .guarantee-box p {
+      color: var(--primary-dark);
+      font-size: 1rem;
+      margin-top: 0;
+      font-weight: 500;
+    }
+
+    /* SECTION 5: FAQS WITH ACCORDIONS */
+    .faq-grid {
+      display: grid;
+      gap: 1.25rem;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .faq-item {
+      background-color: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s ease;
+    }
+
+    .faq-item:hover {
+      border-color: var(--primary-dark);
+    }
+
+    .faq-question {
+      padding: 1.5rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+
+    .faq-icon {
+      font-size: 1.2rem;
+      transition: transform 0.3s ease;
+      font-weight: 800;
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease-out, padding 0.35s ease-out;
+      padding: 0 1.5rem;
+      background-color: var(--bg-color);
+    }
+
+    .faq-item.active .faq-answer {
+      max-height: 200px;
+      padding: 0 1.5rem 1.5rem 1.5rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .faq-item.active .faq-icon {
+      transform: rotate(45deg);
+    }
+
+    /* SECTION 6: FORM & FOOTER */
+    .cta-section {
+      text-align: center;
+      background-color: #ffffff;
+      padding: 5rem 1.25rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .cta-section h2 {
+      font-size: 2.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .cta-bullets {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .cta-bullet-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 720px;
+      margin: 1.5rem auto 0 auto;
+      background: #ffffff;
+      border: 2px solid var(--primary-dark);
+      border-radius: var(--radius-lg);
+      padding: 0.75rem;
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .form-container iframe {
+      width: 100%;
+      min-height: 750px;
+      border: 0;
+      display: block;
+    }
+
+    footer {
+      padding: 3rem 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      border-top: 1px solid var(--border-color);
+      background-color: var(--bg-color);
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: var(--text-main);
+    }
+
+    /* RESPONSIVE MEDIA QUERIES */
+    @media (max-width: 900px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+      .hero-content-left {
+        text-align: center;
+      }
+      .hero h1 {
+        font-size: 2.15rem;
+      }
+      .hero-sub {
+        font-size: 1.15rem;
+      }
+      .nav-links {
+        display: none; /* Mobile header optimization */
+      }
+    }
+
+    @media (max-width: 640px) {
+      section {
+        padding: 3.5rem 0;
+      }
+      .price-tag {
+        font-size: 3rem;
+      }
+      .quote-text {
+        font-size: 1.3rem;
+      }
+      header .logo {
+        font-size: 1.3rem;
+      }
+      header .btn {
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+      }
+      .mockup-workspace {
+        flex-direction: column;
+      }
+      .mockup-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 0.75rem;
+      }
+      .mockup-main {
+        width: 100%;
+        padding: 1rem;
+      }
+      .form-container iframe {
+        min-height: 800px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER WITH TOP-LEFT BRAND NAME, NAV LINKS & CTA BUTTON -->
+  <header>
+    <div class="container header-content">
+      <a href="#" class="logo">
+        <span class="logo-badge"></span>
+        VividText
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+
+      <a href="#signup" class="btn">Start My Free Draft</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- SECTION 1: HERO SECTION WITH 2-COLUMN DESKTOP LAYOUT -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          
+          <!-- LEFT COLUMN: COPY & CTA -->
+          <div class="hero-content-left">
+            <span class="badge">✨ Built for Students with Dyslexia</span>
+            <h1>The dyslexia-friendly reading and writing app built to help you finish your essay draft fast.</h1>
+            <p class="hero-sub">Write essays that sound as smart as you are, ditch the grammar penalties, and get your lunch break back.</p>
+
+            <!-- ACCESSIBILITY DEMO TOGGLE -->
+            <label class="reader-toggle-bar">
+              <input type="checkbox" id="fontToggle">
+              <span>Enable Lexend Dyslexia Font Mode</span>
+            </label>
+            <br>
+
+            <a href="#signup" class="btn btn-large" style="margin-bottom: 1rem;">Start My Free Draft</a>
+          </div>
+
+          <!-- RIGHT COLUMN: SAAS EDITOR MOCKUP SHOWING REAL WORK -->
+          <div class="hero-mockup-wrapper">
+            <div class="app-mockup" aria-label="VividText App Interface Demonstration">
+              <div class="mockup-topbar">
+                <div class="mockup-dots">
+                  <span class="mockup-dot md-1"></span>
+                  <span class="mockup-dot md-2"></span>
+                  <span class="mockup-dot md-3"></span>
+                </div>
+                <div class="mockup-title-bar">VividText Editor • History Essay.docx</div>
+                <div style="font-size: 0.75rem; color: #aaa;">Draft Saved</div>
+              </div>
+
+              <div class="mockup-workspace">
+                <!-- Sidebar Navigation -->
+                <div class="mockup-sidebar">
+                  <div class="mockup-sidebar-item active">📖 Reading Tools</div>
+                  <div class="mockup-sidebar-item">✏️ Guided Editor</div>
+                  <div class="mockup-sidebar-item">🎯 Essay Outline</div>
+                </div>
+
+                <!-- Active Document Area Showing Transformations -->
+                <div class="mockup-main">
+                  <div>
+                    <div class="score-transformation">
+                      <span>Grammar Grade</span>
+                      <span class="score-badge">58 → 94</span>
+                    </div>
+
+                    <div class="mockup-editor-text">
+                      The results were <span class="mockup-strikethrough">dramatik</span> <span class="mockup-correction">dramatic</span> because the team worked together to finish their essay draft without losing points.
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); display: flex; justify-content: space-between;">
+                      <span>Essay Progress</span>
+                      <span>82% Complete</span>
+                    </div>
+                    <div class="progress-bar-container">
+                      <div class="progress-bar-fill"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST BANNER -->
+    <div class="trust-bar">
+      Designed from real student feedback • Built specifically for dyslexic learning workflows
+    </div>
+
+    <!-- SECTION 2: THE PROBLEM IN CUSTOMER'S OWN WORDS -->
+    <section class="problem-section">
+      <div class="container">
+        <h2 style="font-size: 1.85rem; margin-bottom: 2rem; text-align: center;">Why traditional tools fail:</h2>
+        
+        <div class="quote-card">
+          <p class="quote-text">“when it is written, it sounds so bad because of my grammar it lowers my overall mark”</p>
+        </div>
+
+        <div class="cost-box">
+          <strong>The exact moment it goes wrong:</strong>
+          <p style="margin-top: 0.5rem;">
+            It happens when you get your paper back. You worked for hours and had great ideas, but red ink marks down your grade for simple spelling and grammar mix-ups that your brain missed while reading back over it.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: WHO IT'S FOR -->
+    <section class="audience-section">
+      <div class="container">
+        <h2 class="section-title" style="margin-bottom: 2.5rem;">Who VividText Is Built For</h2>
+        <div class="audience-grid">
+          <div class="audience-card">
+            <span style="font-size: 2rem;">🎓</span>
+            <h3>High School & College</h3>
+            <p>Students writing papers under tight assignment deadlines.</p>
+          </div>
+          <div class="audience-card">
+            <span style="font-size: 2rem;">🧠</span>
+            <h3>Dyslexic Brains</h3>
+            <p>Learners who need visual guidance over heavy walls of text.</p>
+          </div>
+          <div class="audience-card">
+            <span style="font-size: 2rem;">✍️</span>
+            <h3>Grade Recovery</h3>
+            <p>Students tired of losing points for simple grammar mix-ups.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: WHY VIVIDTEXT COMPARISON TABLE -->
+    <section class="comparison-section">
+      <div class="container">
+        <h2 class="section-title">Why Choose VividText?</h2>
+        <div class="comparison-table-wrapper">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Features</th>
+                <th>Standard Spellcheckers</th>
+                <th>Passive Text-to-Speech</th>
+                <th class="highlight-col">VividText</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Built for Dyslexia</strong></td>
+                <td>❌ No</td>
+                <td>❌ Generic</td>
+                <td class="highlight-col"><strong>✅ Yes</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Prevents Homework Fatigue</strong></td>
+                <td>❌ After-the-fact warnings</td>
+                <td>❌ Passive listening only</td>
+                <td class="highlight-col"><strong>✅ Active line isolation</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Phonetic Spelling Fixer</strong></td>
+                <td>❌ Rejects phonetic words</td>
+                <td>❌ None</td>
+                <td class="highlight-col"><strong>✅ Phonetic-first engine</strong></td>
+              </tr>
+              <tr>
+                <td><strong>3-Day Essay Guarantee</strong></td>
+                <td>❌ None</td>
+                <td>❌ None</td>
+                <td class="highlight-col"><strong>✅ 100% Refund Guarantee</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: WHAT THEY GET & HOW IT WORKS IN 4 STEPS -->
+    <section id="how-it-works">
+      <div class="container">
+        <h2 class="section-title">How VividText Works in 4 Steps</h2>
+        
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">1</div>
+              <span class="step-icon">📋</span>
+            </div>
+            <h3>Paste Your Text</h3>
+            <p>Load any rough draft, article, or assignment prompt into VividText in seconds.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">2</div>
+              <span class="step-icon">🔍</span>
+            </div>
+            <h3>Review Easily</h3>
+            <p>Use basic grammar tools to review and break down text effortlessly.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">3</div>
+              <span class="step-icon">📝</span>
+            </div>
+            <h3>Follow Guided Steps</h3>
+            <p>Our step-by-step writing editor guides you through every part of your writing built for dyslexia.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-header">
+              <div class="step-number">4</div>
+              <span class="step-icon">🎉</span>
+            </div>
+            <h3>Finish Your Essay Draft</h3>
+            <p>Go from a rough draft to a finished product in 3 days without losing points to grammar penalties.</p>
+          </div>
+        </div>
+
+        <!-- PRICING CARD -->
+        <h2 id="pricing" class="section-title" style="margin-bottom: 2rem;">Simple, Honest Pricing</h2>
+        <div class="pricing-card">
+          <span class="pricing-badge">Simple Plan</span>
+          <h3>VividText Unlimited</h3>
+          <div class="price-tag">$7.99</div>
+          <div class="price-period">per month • cancel anytime</div>
+
+          <ul class="features-list">
+            <li>
+              <span class="check-icon">✓</span>
+              <span><strong>Free Tier:</strong> Basic grammar tools to help you review text easily</span>
+            </li>
+            <li>
+              <span class="check-icon">✓</span>
+              <span><strong>Unlimited Tier ($7.99/mo):</strong> A step-by-step writing editor built for dyslexia</span>
+            </li>
+            <li>
+              <span class="check-icon">✓</span>
+              <span><strong>Guided Progress:</strong> Guides you from a rough draft to a finished product in 3 days</span>
+            </li>
+            <li>
+              <span class="check-icon">✓</span>
+              <span><strong>Active Learning:</strong> Built for independent writing without passive listening</span>
+            </li>
+          </ul>
+
+          <div class="guarantee-box">
+            <strong>🛡️ 100% Money-Back Guarantee</strong>
+            <p>Finish a stress-free draft in 3 days (with time left for soccer), or get 100% of your money back + a free month.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: REAL OBJECTIONS ANSWERED STRAIGHT (INTERACTIVE ACCORDION) -->
+    <section id="faq" style="background-color: var(--card-bg); border-top: 1px solid var(--border-color);">
+      <div class="container">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        
+        <div class="faq-grid">
+          <div class="faq-item active">
+            <div class="faq-question">
+              <span>"Is this an AI generator that will get me in trouble at school?"</span>
+              <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+              <p>
+                No. VividText doesn't write your essay for you. It fixes phonetic spelling traps and formats text so your own ideas get onto the page without grammar penalties.
+              </p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question">
+              <span>"Do I need a credit card to try it?"</span>
+              <span class="faq-icon">+</span>
+            </div>
+            <div class="faq-answer">
+              <p>
+                No. You can use the free reading tools immediately without entering a card or asking your parents for money.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: EMBEDDED GOOGLE FORM SIGN-UP SECTION WITH TRUST BULLETS -->
+    <section id="signup" class="cta-section">
+      <div class="container">
+        <h2>Ready to finish your next essay draft stress-free?</h2>
+        
+        <div class="cta-bullets">
+          <span class="cta-bullet-item">✓ No credit card required</span>
+          <span class="cta-bullet-item">✓ Takes under 1 minute</span>
+          <span class="cta-bullet-item">✓ 3-day risk-free guarantee</span>
+        </div>
+        
+        <!-- RESPONSIVE GOOGLE FORM EMBED CONTAINER -->
+        <div class="form-container">
+          <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfPwwAnQkdjNLcvKJACGx1KHY6ah31dl8wO-UfQqmgYnuWu9A/viewform?embedded=true" width="640" height="718" frameborder="0" marginheight="0" marginwidth="0" loading="lazy">Loading…</iframe>
+        </div>
+        
+        <p style="font-size: 0.95rem; margin-top: 1.5rem; color: var(--text-muted);">
+          No long-term commitment. Finish a stress-free draft in 3 days or get 100% of your money back + a free month.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-content">
+      <p>&copy; VividText. Built for students with dyslexia.</p>
+      <ul class="footer-links">
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    console.log("VividText Landing Page loaded successfully.");
+
+    // INTERACTIVE FAQ ACCORDION SCRIPT
+    document.addEventListener("DOMContentLoaded", function () {
+      const faqItems = document.querySelectorAll(".faq-item");
+
+      faqItems.forEach(item => {
+        const question = item.querySelector(".faq-question");
+        question.addEventListener("click", () => {
+          const isActive = item.classList.contains("active");
+          
+          faqItems.forEach(otherItem => otherItem.classList.remove("active"));
+          
+          if (!isActive) {
+            item.classList.add("active");
+          }
+        });
+      });
+
+      // ACCESSIBILITY DYSLEXIA FONT TOGGLE SCRIPT
+      const fontToggle = document.getElementById("fontToggle");
+      if (fontToggle) {
+        fontToggle.addEventListener("change", function() {
+          if (this.checked) {
+            document.body.classList.add("accessible-font");
+          } else {
+            document.body.classList.remove("accessible-font");
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
